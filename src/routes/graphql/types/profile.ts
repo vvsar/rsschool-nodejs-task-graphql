@@ -1,0 +1,30 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import {
+  GraphQLBoolean,
+  GraphQLInt,
+  GraphQLNonNull,
+  GraphQLObjectType,
+} from 'graphql';
+import { UUIDType } from './uuid.js';
+import { GraphQLContext } from './context.js';
+import { UserType } from './user.js';
+import { MemberType } from './member.js';
+
+export const ProfileType = new GraphQLObjectType({
+  name: 'Profile',
+  fields: () => ({
+    id: { type: new GraphQLNonNull(UUIDType) },
+    isMale: { type: GraphQLBoolean },
+    yearOfBirth: { type: GraphQLInt },
+    user: { type: new GraphQLNonNull(UserType) },
+    memberType: {
+      type: new GraphQLNonNull(MemberType),
+      resolve: async (profile, _args, context: GraphQLContext) => {
+        return await context.prisma.memberType.findUnique({
+          where: { id: profile.memberTypeId },
+        });
+      },
+    },
+  }),
+});
