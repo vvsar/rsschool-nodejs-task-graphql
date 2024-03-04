@@ -9,7 +9,7 @@ import {
 import { MemberTypeId } from '../../member-types/schemas.js';
 import { ProfileType } from './profile.js';
 
-const MemberIdType = new GraphQLEnumType({
+export const MemberIdType = new GraphQLEnumType({
   name: 'MemberTypeId',
   values: {
     basic: { value: MemberTypeId.BASIC },

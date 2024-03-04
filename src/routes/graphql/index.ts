@@ -1,6 +1,7 @@
 import { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
-import { createGqlResponseSchema, gqlResponseSchema } from './schemas.js';
-import { GraphQLSchema, graphql } from 'graphql';
+import { createGqlResponseSchema, gqlResponseSchema, schema } from './schemas.js';
+import { graphql, validate, parse } from 'graphql';
+import depthLimit from 'graphql-depth-limit';
 
 const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
   fastify.route({
@@ -14,11 +15,42 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
     },
     async handler(req) {
       const { query, variables } = req.body;
-      return graphql({
-        schema: new GraphQLSchema,
+
+      const errors = validate(schema, parse(query), [depthLimit(5)]);
+
+      if (errors.length > 0) {
+        return { data: null, errors: errors };
+      }
+
+      return await graphql({
+        schema,
         source: query,
         variableValues: variables,
+        contextValue: { prisma: fastify.prisma },
       });
+      // try {
+      //   const errors = validate(schema, parse(query), [depthLimit(5)]);
+      //   if (errors.length > 0) {
+      //     return { data: null, errors: errors };
+      //   }
+      //   return await graphql({
+      //     schema: schema,
+      //     source: query,
+      //     variableValues: variables,
+      //     contextValue: { prisma: fastify.prisma },
+      //   });
+      // } catch (error) {
+      //   if (
+      //     error &&
+      //     typeof error === 'object' &&
+      //     'message' in error &&
+      //     typeof error.message === 'string'
+      //   ) {
+      //     throw fastify.httpErrors.badRequest(`Invalid query: ${error.message}`);
+      //   }
+      //   throw new Error();
+      // }
+      
     },
   });
 };
