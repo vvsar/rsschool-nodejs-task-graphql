@@ -5,7 +5,7 @@ import { UserType } from './types/user.js';
 import { ProfileType } from './types/profile.js';
 import { PostType } from './types/post.js';
 import { MemberType, MemberIdType } from './types/member.js';
-import { GraphQLContext } from './types/context.js';
+import { prisma } from './types/typePrisma.js';
 import { UUIDType } from './types/uuid.js';
 
 // const createUser = {

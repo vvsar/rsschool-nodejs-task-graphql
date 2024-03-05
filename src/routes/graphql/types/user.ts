@@ -8,7 +8,7 @@ import {
   GraphQLString,
 } from 'graphql';
 import { UUIDType } from './uuid.js';
-import { GraphQLContext } from './context.js';
+import { prisma } from './typePrisma.js';
 import { ProfileType } from './profile.js';
 import { PostType } from './post.js';
 
@@ -20,24 +20,24 @@ export const UserType = new GraphQLObjectType({
     balance: { type: new GraphQLNonNull(GraphQLFloat) },
     profile: {
       type: new GraphQLNonNull(ProfileType),
-      resolve: async (user, _args, context: GraphQLContext) => {
-        return await context.prisma.profile.findUnique({
+      resolve: async (user) => {
+        return await prisma.profile.findUnique({
           where: { userId: user.id },
         });
       },
     },
     posts: {
       type: new GraphQLList(new GraphQLNonNull(PostType)),
-      resolve: async (user, _args, context: GraphQLContext) => {
-        return await context.prisma.post.findMany({
+      resolve: async (user) => {
+        return await prisma.post.findMany({
           where: { authorId: user.id },
         });
       },
     },
     userSubscribedTo: {
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(UserType))),
-      resolve: async (user, _args, context: GraphQLContext) => {
-        const subscriptions = await context.prisma.subscribersOnAuthors.findMany({
+      resolve: async (user) => {
+        const subscriptions = await prisma.subscribersOnAuthors.findMany({
           where: { subscriberId: user.id },
           include: {
             author: true,
@@ -48,8 +48,8 @@ export const UserType = new GraphQLObjectType({
     },
     subscribedToUser: {
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(UserType))),
-      resolve: async (user, _args, context: GraphQLContext) => {
-        const subscribers = await context.prisma.subscribersOnAuthors.findMany({
+      resolve: async (user) => {
+        const subscribers = await prisma.subscribersOnAuthors.findMany({
           where: { authorId: user.id },
           include: {
             subscriber: true,
