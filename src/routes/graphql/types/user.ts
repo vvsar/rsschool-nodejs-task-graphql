@@ -19,7 +19,7 @@ export const UserType = new GraphQLObjectType({
     name: { type: new GraphQLNonNull(GraphQLString) },
     balance: { type: new GraphQLNonNull(GraphQLFloat) },
     profile: {
-      type: new GraphQLNonNull(ProfileType),
+      type: ProfileType,
       resolve: async (user) => {
         return await prisma.profile.findUnique({
           where: { userId: user.id },
@@ -27,7 +27,7 @@ export const UserType = new GraphQLObjectType({
       },
     },
     posts: {
-      type: new GraphQLList(new GraphQLNonNull(PostType)),
+      type: new GraphQLList(PostType),
       resolve: async (user) => {
         return await prisma.post.findMany({
           where: { authorId: user.id },
@@ -35,7 +35,7 @@ export const UserType = new GraphQLObjectType({
       },
     },
     userSubscribedTo: {
-      type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(UserType))),
+      type: new GraphQLList(UserType),
       resolve: async (user) => {
         const subscriptions = await prisma.subscribersOnAuthors.findMany({
           where: { subscriberId: user.id },
@@ -47,7 +47,7 @@ export const UserType = new GraphQLObjectType({
       },
     },
     subscribedToUser: {
-      type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(UserType))),
+      type: new GraphQLList(UserType),
       resolve: async (user) => {
         const subscribers = await prisma.subscribersOnAuthors.findMany({
           where: { authorId: user.id },
