@@ -1,7 +1,7 @@
 import { Type } from '@fastify/type-provider-typebox';
 import { GraphQLObjectType, GraphQLSchema, GraphQLNonNull } from 'graphql';
 import { queryFields } from './queries.js';
-import { GraphQLContext } from './types/context.js';
+// import { GraphQLContext } from './types/context.js';
 import { UserType } from './types/user.js';
 // import { mutationFields } from './mutations.js';
 
